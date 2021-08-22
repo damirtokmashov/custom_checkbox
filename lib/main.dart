@@ -51,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: SafeArea(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          // mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Expanded(
               child: GridView.builder(
@@ -65,10 +65,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   return ValueListenableBuilder(
                     valueListenable: colorDefault,
                     builder: (context, value, _) => Container(
-                      // width: 20,
-                      // height: 20,
-                      // padding:
-                      //     EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                       child: GestureDetector(
                         onTap: () {
                           list[index].checkValue(list[index].colorValue);
@@ -152,15 +148,15 @@ class DrawCircle extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     var paint = Paint()..color = selected ? fillColor : Colors.transparent;
 
-    canvas.drawCircle(Offset(0.0, 0.0), 15, paint);
+    canvas.drawCircle(Offset(33.0, 33.0), 15, paint);
     final path = Path()
-      ..moveTo(-4, -2)
-      ..lineTo(0, 3)
-      ..moveTo(-2, 3)
-      ..lineTo(6.5, -4);
+      ..moveTo(33, 40)
+      ..lineTo(27, 32)
+      ..moveTo(-33.5, 40)
+      ..lineTo(-25, 26);
 
     canvas.drawCircle(
-        Offset(0, 0),
+        Offset(33, 33),
         15,
         Paint()
           ..color = activeColor
