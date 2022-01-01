@@ -11,52 +11,49 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(),
+      theme: ThemeData.dark(),
+      home: CustomBoxesPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key}) : super(key: key);
+class CustomBoxesPage extends StatefulWidget {
+  CustomBoxesPage({Key? key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _CustomBoxesPageState createState() => _CustomBoxesPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  ScrollController _scrollController = ScrollController(); // NEW
+class _CustomBoxesPageState extends State<CustomBoxesPage> {
+  ScrollController _scrollController = ScrollController();
 
-  @override // NEW
+  @override
   void initState() {
     super.initState();
-    _scrollController = new ScrollController(
+    _scrollController = ScrollController(
       initialScrollOffset: 0.0,
       keepScrollOffset: true,
     );
   }
 
-  var colorDefault = ValueNotifier<Color>(Colors.transparent);
-  var rating = ValueNotifier(0.0);
+  final colorDefault = ValueNotifier<Color>(Colors.transparent);
+  final rating = ValueNotifier(0.0);
   List<ColoredCheckbox> list = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
-        backgroundColor: Colors.red,
+        title: Text('Custom CheckBox'),
+        backgroundColor: Colors.pinkAccent[100],
       ),
       body: SafeArea(
         child: Column(
-          // mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Expanded(
               child: GridView.builder(
                 controller: _scrollController,
                 shrinkWrap: true,
+                padding: EdgeInsets.all(0),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 6,
                 ),
@@ -70,15 +67,21 @@ class _MyHomePageState extends State<MyHomePage> {
                           list[index].checkValue(list[index].colorValue);
                           colorDefault.value = list[index].color!;
                           list
-                              .map((e) => e.selectedValue =
-                                  (e.color == colorDefault.value)
-                                      ? true
-                                      : false)
+                              .map(
+                                (e) => e.selectedValue =
+                                    (e.color == colorDefault.value)
+                                        ? true
+                                        : false,
+                              )
                               .toList();
                         },
                         child: CustomPaint(
-                          painter: DrawCircle(colorDefault.value,
-                              list[index].selectedValue, list[index].color!),
+                          painter: DrawCircle(
+                            fillColor: colorDefault.value,
+                            selected: list[index].selectedValue,
+                            activeColor:
+                                list[index].color ?? Colors.transparent,
+                          ),
                         ),
                       ),
                     ),
@@ -110,8 +113,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                       }
                       list
-                          .map((e) => e.selectedValue =
-                              (e.color == colorDefault.value) ? true : false)
+                          .map(
+                            (e) => e.selectedValue =
+                                (e.color == colorDefault.value) ? true : false,
+                          )
                           .toList();
                     });
                     _scrollController.animateTo(
@@ -140,36 +145,49 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class DrawCircle extends CustomPainter {
-  Color fillColor, activeColor;
-  bool selected;
-  DrawCircle(this.fillColor, this.selected, this.activeColor);
+  final Color fillColor, activeColor;
+  final bool selected;
+
+  DrawCircle({
+    required this.fillColor,
+    required this.selected,
+    required this.activeColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
-    var paint = Paint()..color = selected ? fillColor : Colors.transparent;
+    final paint = Paint()..color = selected ? fillColor : Colors.transparent;
+    final pointHeight = size.height / 2, pointWidth = size.width / 2;
 
-    canvas.drawCircle(Offset(33.0, 33.0), 15, paint);
     final path = Path()
-      ..moveTo(33, 40)
+      ..moveTo(pointHeight, 40)
       ..lineTo(27, 32)
-      ..moveTo(-33.5, 40)
-      ..lineTo(-25, 26);
+      ..moveTo(-pointHeight, 40)
+      ..lineTo(-24, 26);
 
     canvas.drawCircle(
-        Offset(33, 33),
-        15,
-        Paint()
-          ..color = activeColor
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 5);
+      Offset(pointHeight, pointWidth),
+      15,
+      paint,
+    );
+
+    canvas.drawCircle(
+      Offset(pointHeight, pointWidth),
+      15,
+      Paint()
+        ..color = activeColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3,
+    );
 
     canvas.drawPath(
-        path,
-        Paint()
-          ..isAntiAlias = true
-          ..color = Colors.white
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 3);
+      path,
+      Paint()
+        ..isAntiAlias = true
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3,
+    );
   }
 
   @override
