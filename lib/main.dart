@@ -38,7 +38,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage> {
 
   final colorDefault = ValueNotifier<Color>(Colors.transparent);
   final rating = ValueNotifier(0.0);
-  List<ColoredCheckbox> list = [];
+  final list = <ColoredCheckbox>[];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +76,13 @@ class _CustomBoxesPageState extends State<CustomBoxesPage> {
                               .toList();
                         },
                         child: CustomPaint(
-                          painter: DrawCircle(
+                          foregroundPainter: DrawLine(
+                            fillColor: colorDefault.value,
+                            selected: list[index].selectedValue,
+                            activeColor:
+                                list[index].color ?? Colors.transparent,
+                          ),
+                          painter: FillBox(
                             fillColor: colorDefault.value,
                             selected: list[index].selectedValue,
                             activeColor:
@@ -144,11 +150,11 @@ class _CustomBoxesPageState extends State<CustomBoxesPage> {
   }
 }
 
-class DrawCircle extends CustomPainter {
+class FillBox extends CustomPainter {
   final Color fillColor, activeColor;
   final bool selected;
 
-  DrawCircle({
+  FillBox({
     required this.fillColor,
     required this.selected,
     required this.activeColor,
@@ -156,37 +162,51 @@ class DrawCircle extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = selected ? fillColor : Colors.transparent;
-    final pointHeight = size.height / 2, pointWidth = size.width / 2;
-
-    final path = Path()
-      ..moveTo(pointHeight, 40)
-      ..lineTo(27, 32)
-      ..moveTo(-pointHeight, 40)
-      ..lineTo(-24, 26);
+    final halfHeight = size.height / 2, halfWidth = size.width / 2;
 
     canvas.drawCircle(
-      Offset(pointHeight, pointWidth),
-      15,
-      paint,
-    );
-
-    canvas.drawCircle(
-      Offset(pointHeight, pointWidth),
-      15,
+      Offset(halfHeight, halfWidth),
+      16,
       Paint()
         ..color = activeColor
-        ..style = PaintingStyle.stroke
+        ..style = selected ? PaintingStyle.fill : PaintingStyle.stroke
         ..strokeWidth = 3,
     );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+class DrawLine extends CustomPainter {
+  final Color fillColor, activeColor;
+  final bool selected;
+
+  DrawLine({
+    required this.fillColor,
+    required this.selected,
+    required this.activeColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final halfHeight = size.height / 2;
+
+    final path = Path()
+      ..moveTo(halfHeight, 40)
+      ..lineTo(27, 32)
+      ..moveTo(-halfHeight, 40)
+      ..lineTo(-22, 28);
 
     canvas.drawPath(
       path,
       Paint()
-        ..isAntiAlias = true
         ..color = Colors.white
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 3,
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.round,
     );
   }
 

@@ -11,10 +11,10 @@ class ColoredCheckbox {
   bool oneMoreSelected = false;
 
   ColoredCheckbox(this.colorValue);
-  static const colors = {
-    EnumColor.red: Colors.red,
-    EnumColor.blue: Colors.blue,
-    EnumColor.green: Colors.green,
+  static final colors = {
+    EnumColor.red: Colors.red[300],
+    EnumColor.blue: Colors.blue[300],
+    EnumColor.green: Colors.green[300],
   };
 
   Color? get color => colors[colorValue];
