@@ -27,7 +27,12 @@ class CustomBoxesPage extends StatefulWidget {
 class _CustomBoxesPageState extends State<CustomBoxesPage>
     with SingleTickerProviderStateMixin {
   ScrollController _scrollController = ScrollController();
-  late AnimationController _controller;
+  late AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: Duration(
+      milliseconds: 100,
+    ),
+  );
   late Animation radiusColored;
   double radius = 0.0;
 
@@ -38,12 +43,10 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
       initialScrollOffset: 0.0,
       keepScrollOffset: true,
     );
-    _controller = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 300));
     radiusColored = Tween(begin: 0.0, end: 16.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Interval(0.5, 1.0),
+        curve: Interval(0.1, 1.0),
       )..addListener(() {
           setState(() {
             radius = radiusColored.value;
@@ -69,7 +72,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
               child: GridView.builder(
                 controller: _scrollController,
                 shrinkWrap: true,
-                padding: EdgeInsets.all(0),
+                padding: const EdgeInsets.all(0.0),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 6,
                 ),
@@ -84,7 +87,8 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                         _controller.addStatusListener(
                           (status) {
                             if (status == AnimationStatus.completed) {
-                              _controller.stop();
+                              // _controller.reset();
+                              // _controller.stop();
                             }
                           },
                         );
@@ -116,6 +120,8 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
             Slider(
               onChanged: (newRating) {
                 setState(() => rating.value = newRating);
+                _controller.duration =
+                    Duration(milliseconds: 100 + rating.value.toInt() * 10);
               },
               value: rating.value,
               min: 0,
