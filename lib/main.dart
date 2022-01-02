@@ -28,8 +28,8 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
     with SingleTickerProviderStateMixin {
   ScrollController _scrollController = ScrollController();
   late AnimationController _controller;
-  late Animation colorAnimation;
-  late Color animatedColor;
+  late Animation radiusColored;
+  double radius = 0.0;
 
   @override
   void initState() {
@@ -38,16 +38,15 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
       initialScrollOffset: 0.0,
       keepScrollOffset: true,
     );
-    _controller =
-        AnimationController(vsync: this, duration: Duration(seconds: 3));
-    colorAnimation =
-        ColorTween(begin: Colors.transparent, end: Colors.blue).animate(
+    _controller = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 300));
+    radiusColored = Tween(begin: 0.0, end: 16.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Interval(0.5, 1.0),
       )..addListener(() {
           setState(() {
-            animatedColor = colorAnimation.value;
+            radius = radiusColored.value;
           });
         }),
     );
@@ -80,6 +79,15 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                     valueListenable: colorDefault,
                     builder: (context, value, _) => GestureDetector(
                       onTap: () {
+                        _controller.reset();
+                        _controller.forward();
+                        _controller.addStatusListener(
+                          (status) {
+                            if (status == AnimationStatus.completed) {
+                              _controller.stop();
+                            }
+                          },
+                        );
                         list[index].checkValue(list[index].colorValue);
                         colorDefault.value = list[index].color!;
                         list
@@ -94,6 +102,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                       child: CustomPaint(
                         foregroundPainter: DrawLine(),
                         painter: FillCustomBox(
+                          radius: radius,
                           selected: list[index].selectedValue,
                           activeColor: list[index].color ?? Colors.transparent,
                         ),
@@ -117,7 +126,6 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
               children: <Widget>[
                 TextButton(
                   onPressed: () {
-                    _controller.forward();
                     setState(() {
                       for (int i = 0; i < 10; i++) {
                         list.add(
@@ -160,10 +168,12 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
 }
 
 class FillCustomBox extends CustomPainter {
+  final double radius;
   final Color activeColor;
   final bool selected;
 
   FillCustomBox({
+    required this.radius,
     required this.selected,
     required this.activeColor,
   });
@@ -175,15 +185,23 @@ class FillCustomBox extends CustomPainter {
       size.height / 2,
     );
 
+    final fillBox = Paint()
+      ..color = activeColor
+      ..style = PaintingStyle.fill
+      ..strokeWidth = 2.0
+      ..isAntiAlias = false;
+
     canvas.drawCircle(
       offsetCenter,
       offsetCenter.dx / 2,
       Paint()
         ..color = activeColor
-        ..style = selected ? PaintingStyle.fill : PaintingStyle.stroke
+        ..style = PaintingStyle.stroke
         ..strokeWidth = 3
         ..strokeJoin = StrokeJoin.round,
     );
+
+    if (selected == true) canvas.drawCircle(offsetCenter, radius, fillBox);
   }
 
   @override
