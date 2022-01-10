@@ -39,7 +39,6 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
     ),
   );
   late Animation radiusFilled;
-  double radius = 0.0;
 
   @override
   void initState() {
@@ -61,7 +60,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
         ),
       )..addListener(() {
           setState(() {
-            radius = radiusFilled.value;
+            radiusFilled.value;
           });
         }),
     );
@@ -86,8 +85,9 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                 shrinkWrap: true,
                 padding: const EdgeInsets.all(0.0),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 6,
-                ),
+                    crossAxisCount: 6,
+                    crossAxisSpacing: 1.0,
+                    mainAxisSpacing: 1.0),
                 itemCount: list.length,
                 itemBuilder: (BuildContext context, int index) {
                   return ValueListenableBuilder(
@@ -110,7 +110,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                       child: CustomPaint(
                         foregroundPainter: DrawLine(),
                         painter: FillCustomBox(
-                          radius: radius,
+                          radius: radiusFilled.value,
                           selected: list[index].selectedValue,
                           activeColor: list[index].color ?? Colors.transparent,
                         ),
