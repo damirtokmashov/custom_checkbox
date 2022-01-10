@@ -11,8 +11,8 @@ class DrawLine extends CustomPainter {
     final path = Path()
       ..moveTo(offsetCenter.dx - 1, offsetCenter.dy + 6)
       ..lineTo(offsetCenter.dx - 7, offsetCenter.dy - 2)
-      ..moveTo(-offsetCenter.dx - 1, offsetCenter.dy + 6)
-      ..lineTo(-offsetCenter.dx + 8, offsetCenter.dy - 5);
+      ..moveTo(offsetCenter.dx - 1, offsetCenter.dy + 6)
+      ..lineTo(offsetCenter.dx + 8, offsetCenter.dy - 5);
 
     canvas.drawPath(
       path,

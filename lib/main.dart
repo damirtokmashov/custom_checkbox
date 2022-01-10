@@ -83,11 +83,11 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
               child: GridView.builder(
                 controller: _scrollController,
                 shrinkWrap: true,
-                padding: const EdgeInsets.all(0.0),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 6,
-                    crossAxisSpacing: 1.0,
-                    mainAxisSpacing: 1.0),
+                  crossAxisCount: 6,
+                  crossAxisSpacing: 1.0,
+                  mainAxisSpacing: 1.0,
+                ),
                 itemCount: list.length,
                 itemBuilder: (BuildContext context, int index) {
                   return ValueListenableBuilder(
