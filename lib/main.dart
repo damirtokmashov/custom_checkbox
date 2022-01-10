@@ -3,11 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:test_task/model/colored_checkbox.dart';
 
+import 'const.dart';
+
 void main() {
-  runApp(MyApp());
+  runApp(App());
 }
 
-class MyApp extends StatelessWidget {
+class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -56,7 +58,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
   }
 
   final colorDefault = ValueNotifier<Color>(Colors.transparent);
-  final rating = ValueNotifier(0.0);
+  final currentAnimation = ValueNotifier(0.0);
   final list = <ColoredCheckbox>[];
   @override
   Widget build(BuildContext context) {
@@ -75,6 +77,9 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                 padding: const EdgeInsets.all(0.0),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 6,
+                  // childAspectRatio: 1.5,
+                  // crossAxisSpacing: 2.0,
+                  // mainAxisSpacing: 4.0,
                 ),
                 itemCount: list.length,
                 itemBuilder: (BuildContext context, int index) {
@@ -116,19 +121,23 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                 },
               ),
             ),
-            Text('Animation Duration'),
+            SizedBox(
+              height: 20,
+            ),
+            Text(animationDuration),
             Slider(
               onChanged: (newRating) {
-                setState(() => rating.value = newRating);
-                _controller.duration =
-                    Duration(milliseconds: 100 + rating.value.toInt() * 10);
+                setState(() => currentAnimation.value = newRating);
+                _controller.duration = Duration(
+                    milliseconds: 100 + currentAnimation.value.toInt() * 10);
               },
-              value: rating.value,
+              value: currentAnimation.value,
               min: 0,
               max: 100,
             ),
-            Text('${rating.value.roundToDouble()} ms for animation'),
+            Text('${currentAnimation.value.roundToDouble()} ms for animation'),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -154,7 +163,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                       curve: Curves.ease,
                     );
                   },
-                  child: Text('Add checkboxes'),
+                  child: Text(addBtn),
                 ),
                 TextButton(
                   onPressed: () {
@@ -162,7 +171,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                       list.clear();
                     });
                   },
-                  child: Text('Clear'),
+                  child: Text(clearBtn),
                 ),
               ],
             ),
