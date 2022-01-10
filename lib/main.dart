@@ -1,9 +1,12 @@
 import 'dart:math';
+// import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:test_task/model/colored_checkbox.dart';
 
-import 'const.dart';
+import 'utils/const.dart';
+import 'utils/draw_line.dart';
+import 'utils/fill_custom_box.dart';
 
 void main() {
   runApp(App());
@@ -29,13 +32,13 @@ class CustomBoxesPage extends StatefulWidget {
 class _CustomBoxesPageState extends State<CustomBoxesPage>
     with SingleTickerProviderStateMixin {
   ScrollController _scrollController = ScrollController();
-  late AnimationController _controller = AnimationController(
+  late AnimationController _animationController = AnimationController(
     vsync: this,
     duration: Duration(
       milliseconds: 100,
     ),
   );
-  late Animation radiusColored;
+  late Animation radiusFilled;
   double radius = 0.0;
 
   @override
@@ -45,19 +48,26 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
       initialScrollOffset: 0.0,
       keepScrollOffset: true,
     );
-    radiusColored = Tween(begin: 0.0, end: 16.0).animate(
+    radiusFilled = Tween(
+      begin: 0.0,
+      end: 16.0,
+    ).animate(
       CurvedAnimation(
-        parent: _controller,
-        curve: Interval(0.1, 1.0),
+        parent: _animationController,
+        curve: Interval(
+          0.1,
+          1.0,
+          curve: Curves.slowMiddle,
+        ),
       )..addListener(() {
           setState(() {
-            radius = radiusColored.value;
+            radius = radiusFilled.value;
           });
         }),
     );
   }
 
-  final colorDefault = ValueNotifier<Color>(Colors.transparent);
+  final colorInitial = ValueNotifier<Color>(Colors.transparent);
   final currentAnimation = ValueNotifier(0.0);
   final list = <ColoredCheckbox>[];
   @override
@@ -77,32 +87,21 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                 padding: const EdgeInsets.all(0.0),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 6,
-                  // childAspectRatio: 1.5,
-                  // crossAxisSpacing: 2.0,
-                  // mainAxisSpacing: 4.0,
                 ),
                 itemCount: list.length,
                 itemBuilder: (BuildContext context, int index) {
                   return ValueListenableBuilder(
-                    valueListenable: colorDefault,
+                    valueListenable: colorInitial,
                     builder: (context, value, _) => GestureDetector(
                       onTap: () {
-                        _controller.reset();
-                        _controller.forward();
-                        _controller.addStatusListener(
-                          (status) {
-                            if (status == AnimationStatus.completed) {
-                              // _controller.reset();
-                              // _controller.stop();
-                            }
-                          },
-                        );
+                        _animationController.reset();
+                        _animationController.forward();
                         list[index].checkValue(list[index].colorValue);
-                        colorDefault.value = list[index].color!;
+                        colorInitial.value = list[index].color!;
                         list
                             .map(
                               (e) => e.selectedValue =
-                                  (e.color == colorDefault.value)
+                                  (e.color == colorInitial.value)
                                       ? true
                                       : false,
                             )
@@ -126,9 +125,9 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
             ),
             Text(animationDuration),
             Slider(
-              onChanged: (newRating) {
-                setState(() => currentAnimation.value = newRating);
-                _controller.duration = Duration(
+              onChanged: (changedAnimation) {
+                setState(() => currentAnimation.value = changedAnimation);
+                _animationController.duration = Duration(
                     milliseconds: 100 + currentAnimation.value.toInt() * 10);
               },
               value: currentAnimation.value,
@@ -153,7 +152,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                       list
                           .map(
                             (e) => e.selectedValue =
-                                (e.color == colorDefault.value) ? true : false,
+                                (e.color == colorInitial.value) ? true : false,
                           )
                           .toList();
                     });
@@ -179,78 +178,5 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
         ),
       ),
     );
-  }
-}
-
-class FillCustomBox extends CustomPainter {
-  final double radius;
-  final Color activeColor;
-  final bool selected;
-
-  FillCustomBox({
-    required this.radius,
-    required this.selected,
-    required this.activeColor,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final offsetCenter = Offset(
-      size.width / 2,
-      size.height / 2,
-    );
-
-    final fillBox = Paint()
-      ..color = activeColor
-      ..style = PaintingStyle.fill
-      ..strokeWidth = 2.0
-      ..isAntiAlias = false;
-
-    canvas.drawCircle(
-      offsetCenter,
-      offsetCenter.dx / 2,
-      Paint()
-        ..color = activeColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3
-        ..strokeJoin = StrokeJoin.round,
-    );
-
-    if (selected == true) canvas.drawCircle(offsetCenter, radius, fillBox);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
-}
-
-class DrawLine extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final offsetCenter = Offset(
-      size.width / 2,
-      size.height / 2,
-    );
-
-    final path = Path()
-      ..moveTo(offsetCenter.dx - 1, offsetCenter.dy + 6)
-      ..lineTo(offsetCenter.dx - 7, offsetCenter.dy - 2)
-      ..moveTo(-offsetCenter.dx - 1, offsetCenter.dy + 6)
-      ..lineTo(-offsetCenter.dx + 8, offsetCenter.dy - 5);
-
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3
-        ..strokeCap = StrokeCap.round,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
   }
 }
