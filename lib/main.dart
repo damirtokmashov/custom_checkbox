@@ -1,5 +1,4 @@
 import 'dart:math';
-// import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:test_task/model/colored_checkbox.dart';
@@ -8,9 +7,7 @@ import 'utils/const.dart';
 import 'utils/draw_line.dart';
 import 'utils/fill_custom_box.dart';
 
-void main() {
-  runApp(App());
-}
+void main() => runApp(App());
 
 class App extends StatelessWidget {
   @override
@@ -38,7 +35,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
       milliseconds: 100,
     ),
   );
-  late Animation radiusFilled;
+  late Animation _radiusFilled;
 
   @override
   void initState() {
@@ -47,7 +44,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
       initialScrollOffset: 0.0,
       keepScrollOffset: true,
     );
-    radiusFilled = Tween(
+    _radiusFilled = Tween(
       begin: 0.0,
       end: 16.0,
     ).animate(
@@ -58,17 +55,29 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
           1.0,
           curve: Curves.slowMiddle,
         ),
-      )..addListener(() {
-          setState(() {
-            radiusFilled.value;
-          });
-        }),
+      )..addListener(
+          () {
+            setState(() {
+              _radiusFilled.value;
+            });
+          },
+        ),
     );
   }
 
   final colorInitial = ValueNotifier<Color>(Colors.transparent);
   final currentAnimation = ValueNotifier(0.0);
   final list = <ColoredCheckbox>[];
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _radiusFilled.removeListener(() {});
+    colorInitial.dispose();
+    currentAnimation.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,7 +119,7 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
                       child: CustomPaint(
                         foregroundPainter: DrawLine(),
                         painter: FillCustomBox(
-                          radius: radiusFilled.value,
+                          radius: _radiusFilled.value,
                           selected: list[index].selectedValue,
                           activeColor: list[index].color ?? Colors.transparent,
                         ),
@@ -140,22 +149,26 @@ class _CustomBoxesPageState extends State<CustomBoxesPage>
               children: <Widget>[
                 TextButton(
                   onPressed: () {
-                    setState(() {
-                      for (int i = 0; i < 10; i++) {
-                        list.add(
-                          ColoredCheckbox(
-                            EnumColor.values[
-                                Random().nextInt(EnumColor.values.length)],
-                          ),
-                        );
-                      }
-                      list
-                          .map(
-                            (e) => e.selectedValue =
-                                (e.color == colorInitial.value) ? true : false,
-                          )
-                          .toList();
-                    });
+                    setState(
+                      () {
+                        for (int i = 0; i < 10; i++) {
+                          list.add(
+                            ColoredCheckbox(
+                              EnumColor.values[
+                                  Random().nextInt(EnumColor.values.length)],
+                            ),
+                          );
+                        }
+                        list
+                            .map(
+                              (e) => e.selectedValue =
+                                  (e.color == colorInitial.value)
+                                      ? true
+                                      : false,
+                            )
+                            .toList();
+                      },
+                    );
                     _scrollController.animateTo(
                       _scrollController.position.maxScrollExtent,
                       duration: const Duration(milliseconds: 300),

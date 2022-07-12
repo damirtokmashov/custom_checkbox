@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:math' show Random;
-import 'dart:ui' show Color;
+
+import 'package:flutter/material.dart';
 
 enum EnumColor { red, blue, green }
 
@@ -19,22 +19,19 @@ class ColoredCheckbox {
 
   Color? get color => colors[colorValue];
 
-  bool? checkValue(EnumColor tapColor) {
+  bool checkValue(EnumColor tapColor) {
     switch (tapColor) {
       case EnumColor.green:
-        selectedValue = true;
-        break;
+        return selectedValue = true;
       case EnumColor.red:
-        selectedValue = true;
-        break;
+        return selectedValue = true;
       case EnumColor.blue:
-        selectedValue = true;
-        break;
+        return selectedValue = true;
       default:
-        selectedValue = false;
+        return selectedValue = false;
     }
   }
 
-  static EnumColor get random =>
+  EnumColor get random =>
       EnumColor.values[Random().nextInt(EnumColor.values.length)];
 }
